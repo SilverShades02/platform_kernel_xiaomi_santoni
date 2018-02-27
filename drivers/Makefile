@@ -170,12 +170,13 @@ obj-$(CONFIG_MCB)		+= mcb/
 obj-$(CONFIG_PERF_EVENTS)	+= perf/
 obj-$(CONFIG_RAS)		+= ras/
 obj-$(CONFIG_THUNDERBOLT)	+= thunderbolt/
-obj-$(CONFIG_CORESIGHT)		+= hwtracing/coresight/
-obj-y				+= hwtracing/intel_th/
-obj-$(CONFIG_STM)		+= hwtracing/stm/
-obj-$(CONFIG_ANDROID)		+= android/
-obj-$(CONFIG_NVMEM)		+= nvmem/
-obj-$(CONFIG_ESOC)              += esoc/
-obj-$(CONFIG_FPGA)		+= fpga/
-obj-$(CONFIG_SENSORS_SSC)		+= sensors/
-obj-$(CONFIG_TEE)		+= tee/
+obj-$(CONFIG_CORESIGHT)		+= coresight/
+obj-$(CONFIG_ESOC)		+= esoc/
+
+obj-$(CONFIG_BIF)		+= bif/
+
+obj-$(CONFIG_SENSORS)		+= sensors/
+obj-$(CONFIG_SENSORS_SSC)	+= sensors/
+
+obj-$(CONFIG_FINGERPRINT)	+= fingerprint/
+>>>>>>> cda8373... drivers: Import Xiaomi FPC & Goodix fingerprint drivers
