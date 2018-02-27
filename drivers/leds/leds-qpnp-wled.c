@@ -106,8 +106,10 @@
 #define QPNP_WLED_BOOST_DUTY_MIN_NS	26
 #define QPNP_WLED_BOOST_DUTY_MAX_NS	156
 #define QPNP_WLED_DEF_BOOST_DUTY_NS	104
-#define QPNP_WLED_SWITCH_FREQ_MASK	GENMASK(3, 0)
-#define QPNP_WLED_SWITCH_FREQ_OVERWRITE BIT(7)
+#define QPNP_WLED_SWITCH_FREQ_MASK	0x70
+#define QPNP_WLED_SWITCH_FREQ_600_KHZ	600
+#define QPNP_WLED_SWITCH_FREQ_1600_KHZ	1600
+#define QPNP_WLED_SWITCH_FREQ_OVERWRITE 0x80
 #define QPNP_WLED_OVP_MASK		GENMASK(1, 0)
 #define QPNP_WLED_TEST4_EN_DEB_BYPASS_ILIM_BIT	BIT(6)
 #define QPNP_WLED_TEST4_EN_SH_FOR_SS_BIT	BIT(5)
@@ -186,7 +188,7 @@
 #define QPNP_WLED_SINK_TEST5_DIG	0x1E
 #define QPNP_WLED_SINK_TEST5_HVG_PULL_STR_BIT	BIT(3)
 
-#define QPNP_WLED_SWITCH_FREQ_800_KHZ_CODE	0x0B
+#define QPNP_WLED_SWITCH_FREQ_600_KHZ_CODE	0x0B
 #define QPNP_WLED_SWITCH_FREQ_1600_KHZ_CODE	0x05
 
 #define QPNP_WLED_DISP_SEL_REG(b)	(b + 0x44)
@@ -1892,21 +1894,7 @@ static int qpnp_wled_vref_config(struct qpnp_wled *wled)
 			wled->pmic_rev_id->pmic_subtype == PM660L_SUBTYPE)
 		vref_setting = vref_setting_pmi8998;
 	else
-		vref_setting = vref_setting_pmi8994;
-
-	if (wled->vref_uv < vref_setting.min_uv)
-		wled->vref_uv = vref_setting.min_uv;
-	else if (wled->vref_uv > vref_setting.max_uv)
-		wled->vref_uv = vref_setting.max_uv;
-
-	reg |= DIV_ROUND_CLOSEST(wled->vref_uv - vref_setting.min_uv,
-					vref_setting.step_uv);
-
-	rc = qpnp_wled_masked_write_reg(wled,
-			QPNP_WLED_VREF_REG(wled->ctrl_base),
-			QPNP_WLED_VREF_MASK, reg);
-	if (rc)
-		pr_err("Write VREF_REG failed, rc=%d\n", rc);
+		temp = QPNP_WLED_SWITCH_FREQ_600_KHZ_CODE;
 
 	return rc;
 }
@@ -2511,8 +2499,8 @@ static int qpnp_wled_parse_dt(struct qpnp_wled *wled)
 		return rc;
 	}
 
-	wled->switch_freq_khz = wled->disp_type_amoled ? 1600 : 800;
-	rc = of_property_read_u32(pdev->dev.of_node,
+	wled->switch_freq_khz = QPNP_WLED_SWITCH_FREQ_600_KHZ;
+	rc = of_property_read_u32(spmi->dev.of_node,
 			"qcom,switch-freq-khz", &temp_val);
 	if (!rc) {
 		wled->switch_freq_khz = temp_val;
